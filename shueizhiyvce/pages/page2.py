@@ -13,7 +13,10 @@ from pymcdm import weights
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-
+import os
+# 获取当前文件所在目录
+current_dir = os.path.dirname(os.path.abspath(__file__))
+model_path = os.path.join(current_dir, 'energy_quality_models.pkl')
 # ==================== 中文字体配置 ====================
 plt.rcParams['font.sans-serif'] = ['SimHei', 'DejaVu Sans', 'Arial Unicode MS', 'Microsoft YaHei']
 plt.rcParams['axes.unicode_minus'] = False
@@ -161,13 +164,13 @@ st.header("1️⃣ 模型加载")
 
 col1, col2 = st.columns([3, 1])
 with col1:
-    model_path = st.text_input("模型文件路径", value="energy_quality_models.pkl", label_visibility="collapsed", placeholder="请输入模型文件路径")
+    model_path1 = st.text_input("模型文件路径", value="energy_quality_models.pkl", label_visibility="collapsed", placeholder="请输入模型文件路径")
 with col2:
     load_btn = st.button("🔄 加载模型", use_container_width=True)
 
 if load_btn or 'models' not in st.session_state:
     try:
-        models = joblib.load(model_path)
+        models = joblib.load(model_path,'./energy_quality_models.pkl')
         st.session_state.models = models
         st.markdown('<div class="success-box">✅ 模型加载成功！包含模型: ' + 
                    ', '.join(list(models.keys())) + '</div>', unsafe_allow_html=True)
@@ -923,4 +926,5 @@ st.markdown("""
     <hr style='margin: 1rem 0; border: none; border-top: 1px solid #ddd;'>
     <p style='color: #999; font-size: 0.9rem;'>© 2025 污水处理智能优化系统 | Powered by NSGA-II & TOPSIS</p>
 </div>
+
 """, unsafe_allow_html=True)

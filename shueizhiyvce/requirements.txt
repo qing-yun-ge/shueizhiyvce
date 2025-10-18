@@ -1,3 +1,7 @@
+pandas
+numpy
 joblib
+pymoo
+pymcdm
+matplotlib
 plotly
-

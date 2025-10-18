@@ -4,7 +4,9 @@ import numpy as np
 import joblib
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-
+# 获取当前文件所在目录
+current_dir = os.path.dirname(os.path.abspath(__file__))
+model_path = os.path.join(current_dir, 'energy_quality_models.pkl')
 # ==================== 页面配置 ====================
 st.set_page_config(
     page_title="污水处理厂预测系统", 
@@ -135,7 +137,7 @@ st.markdown('<p class="sub-title">基于机器学习的出水水质与能耗预�
 @st.cache_resource
 def load_models():
     try:
-        return joblib.load('energy_quality_models.pkl')
+        return joblib.load('./energy_quality_models.pkl')
     except Exception as e:
         st.error(f"❌ 模型加载失败: {e}")
         st.stop()
@@ -626,4 +628,5 @@ st.markdown("""
     <hr style='margin: 1rem 0; border: none; border-top: 1px solid #ddd;'>
     <p style='color: #999; font-size: 0.9rem;'>© 2025 污水处理智能预测系统 | Powered by Machine Learning</p>
 </div>
+
 """, unsafe_allow_html=True)

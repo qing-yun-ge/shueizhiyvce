@@ -4,6 +4,7 @@ import numpy as np
 import joblib
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
+import os
 # 获取当前文件所在目录
 current_dir = os.path.dirname(os.path.abspath(__file__))
 model_path = os.path.join(current_dir, 'energy_quality_models.pkl')
@@ -630,3 +631,4 @@ st.markdown("""
 </div>
 
 """, unsafe_allow_html=True)
+

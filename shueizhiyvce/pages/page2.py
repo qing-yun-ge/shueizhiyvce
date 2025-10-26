@@ -522,7 +522,7 @@ if st.button("🚀 运行 NSGA-II 多目标优化", use_container_width=True, di
                 color=scores,
                 colorscale='Viridis',
                 showscale=True,
-                colorbar=dict(title="TOPSIS<br>分数", titleside="right"),
+                colorbar=dict(title="TOPSIS<br>分数"),
                 line=dict(width=1, color='white')
             ),
             text=[f'Score: {s:.4f}' for s in scores],
@@ -928,3 +928,4 @@ st.markdown("""
 </div>
 
 """, unsafe_allow_html=True)
+

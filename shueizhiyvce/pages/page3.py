@@ -74,16 +74,16 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# 加载模型
+# ==================== 加载模型 ====================
 @st.cache_resource
-def load_model():
-    if not os.path.exists(model_path):
-        st.error(f"❌ 模型文件不存在: {model_path}")
+def load_models():
+    try:
+        return joblib.load( model_path,'./inhibitor_model.pkl')
+    except Exception as e:
+        st.error(f"❌ 模型加载失败: {e}")
         st.stop()
-    return joblib.load(model_path)
 
-model = load_model()
-
+model = load_models()
 # 生成分子SMILES结构图（使用在线API）
 def get_molecule_image(smiles):
     try:
@@ -244,3 +244,4 @@ st.markdown("""
         <p>Made with ❤️ using Streamlit & RDKit</p>
     </div>
 """, unsafe_allow_html=True)
+

@@ -2,12 +2,10 @@ import streamlit as st
 from rdkit import Chem
 from rdkit.Chem.rdMolDescriptors import GetMorganFingerprintAsBitVect
 from rdkit.Chem import Descriptors
-try:
-    from rdkit.Chem import Draw
-except ImportError:
-    from rdkit.Chem.Draw import MolToImage as Draw_MolToImage
 import joblib
 import plotly.graph_objects as go
+from PIL import Image
+import io
 
 st.set_page_config(page_title="抑制剂预测", layout="wide", initial_sidebar_state="collapsed")
 
@@ -86,6 +84,19 @@ def load_model():
 
 model = load_model()
 
+# 生成分子SMILES结构图（使用在线API）
+def get_molecule_image(smiles):
+    try:
+        # 使用PubChem API获取分子结构图
+        url = f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/{smiles}/PNG?image_size=350x350"
+        import requests
+        response = requests.get(url, timeout=5)
+        if response.status_code == 200:
+            return Image.open(io.BytesIO(response.content))
+    except:
+        pass
+    return None
+
 # 输入区域
 st.markdown('<div class="input-section">', unsafe_allow_html=True)
 st.subheader("📝 输入分子SMILES")
@@ -115,12 +126,14 @@ if predict_button and smiles_input:
         with col1:
             st.markdown('<div class="molecule-section">', unsafe_allow_html=True)
             st.subheader("🧬 分子结构")
-            try:
-                img = Draw.MolToImage(mol, size=(350, 350))
-            except:
-                from rdkit.Chem import AllChem
-                img = AllChem.MolToImage(mol, size=(350, 350))
-            st.image(img, use_column_width=True)
+            
+            # 尝试获取分子图像
+            mol_img = get_molecule_image(smiles_input)
+            if mol_img:
+                st.image(mol_img, use_column_width=True)
+            else:
+                st.info("📌 分子结构图加载中...\n(使用在线API渲染)")
+            
             st.markdown('</div>', unsafe_allow_html=True)
         
         with col2:
@@ -208,12 +221,6 @@ elif predict_button:
 st.markdown("---")
 st.subheader("💡 示例SMILES")
 col_ex1, col_ex2, col_ex3 = st.columns(3, gap="large")
-
-example_smiles = [
-    "CC(C)Cc1ccc(cc1)C(C)C(O)=O",
-    "c1ccccc1",
-    "CCO"
-]
 
 with col_ex1:
     st.markdown("""

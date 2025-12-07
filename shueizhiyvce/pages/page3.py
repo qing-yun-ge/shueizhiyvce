@@ -83,7 +83,7 @@ st.markdown("""
 # 加载模型
 @st.cache_resource
 def load_model():
-    return joblib.load('./inhibitor_model.pkl')
+     return joblib.load( model_path,'./inhibitor_model.pkl')
  
 model = load_model()
 
@@ -251,6 +251,7 @@ st.markdown("""
         <p>Made with ❤️ using Streamlit & RDKit</p>
     </div>
 """, unsafe_allow_html=True)
+
 
 
 

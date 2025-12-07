@@ -8,5 +8,7 @@ plotly
 xgboost
 joblib
 rdkit==2025.9.1
+scikit-learn
+
 
 

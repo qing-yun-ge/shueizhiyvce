@@ -78,7 +78,7 @@ st.markdown("""
 @st.cache_resource
 def load_models():
     try:
-        return joblib.load( model_path)
+        return joblib.load('./inhibitor_model.pkl')
     except Exception as e:
         st.error(f"❌ 模型加载失败: {e}")
         st.stop()
@@ -244,6 +244,7 @@ st.markdown("""
         <p>Made with ❤️ using Streamlit & RDKit</p>
     </div>
 """, unsafe_allow_html=True)
+
 
 
 

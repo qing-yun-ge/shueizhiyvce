@@ -12,7 +12,7 @@ st.title("🧪 分子抑制剂预测系统")
 # 加载模型
 @st.cache_resource
 def load_model():
-    return joblib.load('inhibitor_model.pkl')
+    return joblib.load(model_path,'./inhibitor_model.pkl')
 
 model = load_model()
 
@@ -92,3 +92,4 @@ with col_ex2:
     st.code("c1ccccc1", language="")
 with col_ex3:
     st.code("CCO", language="")
+

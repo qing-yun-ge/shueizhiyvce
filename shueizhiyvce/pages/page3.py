@@ -241,14 +241,14 @@ col_ex1, col_ex2, col_ex3 = st.columns(3, gap="large")
 with col_ex1:
     st.markdown("""
     <div style="background: rgba(102,126,234,0.1); padding: 15px; border-radius: 10px; text-align: center;">
-        <code style="background: rgba(102,126,234,0.2); padding: 8px; border-radius: 5px; color: #333;">CC(C)Cc1ccc(cc1)</code>
+        <code style="background: rgba(102,126,234,0.2); padding: 8px; border-radius: 5px; color: #333;">[H]c1c(N([H])c2nc3c([H])c(F)c(F)c([H])c3n2-c2nc(N([H])[H])nc(C([H])([H])[H])n2)nn([H])c1[H]</code>
     </div>
     """, unsafe_allow_html=True)
 
 with col_ex2:
     st.markdown("""
     <div style="background: rgba(102,126,234,0.1); padding: 15px; border-radius: 10px; text-align: center;">
-        <code style="background: rgba(102,126,234,0.2); padding: 8px; border-radius: 5px; color: #333;">c1ccccc1</code>
+        <code style="background: rgba(102,126,234,0.2); padding: 8px; border-radius: 5px; color: #333;">[H]c1c([H])c(Br)c([H])c(C([H])([H])N([H])C(=O)N([H])c2c([H])c([H])c(C(F)(F)F)c([H])c2[H])c1[H]</code>
     </div>
     """, unsafe_allow_html=True)
 
@@ -264,3 +264,4 @@ st.markdown("""
         <p>Made with ❤️ using Streamlit & RDKit</p>
     </div>
 """, unsafe_allow_html=True)
+

@@ -6,7 +6,10 @@ import joblib
 import plotly.graph_objects as go
 from PIL import Image
 import io
-
+import os
+# 获取当前文件所在目录
+current_dir = os.path.dirname(os.path.abspath(__file__))
+model_path = os.path.join(current_dir, 'inhibitor_model.pkl')
 st.set_page_config(page_title="抑制剂预测", layout="wide", initial_sidebar_state="collapsed")
 
 # 自定义CSS美化
@@ -80,7 +83,7 @@ st.markdown("""
 # 加载模型
 @st.cache_resource
 def load_model():
-    return joblib.load(model_path,'.inhibitor_model.pkl')
+    return joblib.load(model_path,'./inhibitor_model.pkl')
 
 model = load_model()
 
@@ -248,4 +251,5 @@ st.markdown("""
         <p>Made with ❤️ using Streamlit & RDKit</p>
     </div>
 """, unsafe_allow_html=True)
+
 

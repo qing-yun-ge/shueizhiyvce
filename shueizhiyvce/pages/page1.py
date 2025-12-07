@@ -138,7 +138,7 @@ st.markdown('<p class="sub-title">基于机器学习的出水水质与能耗预�
 @st.cache_resource
 def load_models():
     try:
-        return joblib.load( model_path,'./energy_quality_models.pkl')
+        return joblib.load( model_path)
     except Exception as e:
         st.error(f"❌ 模型加载失败: {e}")
         st.stop()
@@ -631,5 +631,6 @@ st.markdown("""
 </div>
 
 """, unsafe_allow_html=True)
+
 
 

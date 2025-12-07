@@ -7,14 +7,16 @@ import plotly.graph_objects as go
 from PIL import Image
 import io
 import os
+import requests # 引入 requests 库用于分子图片 API 调用
 
 # 获取当前文件所在目录
+# 请确保 inhibitor_model.pkl 文件与 page3.py 在同一目录或可访问路径
 current_dir = os.path.dirname(os.path.abspath(__file__))
 model_path = os.path.join(current_dir, 'inhibitor_model.pkl')
 
 st.set_page_config(page_title="抑制剂预测", layout="wide", initial_sidebar_state="collapsed")
 
-# 自定义CSS美化
+# ==================== 自定义CSS美化（已修改 color 属性）====================
 st.markdown("""
     <style>
     .main {
@@ -27,7 +29,10 @@ st.markdown("""
         padding: 15px;
         margin: 10px 0;
         border-left: 4px solid #667eea;
-        color: white;
+        color: #333; /* ✨ 核心修改：将文本颜色设置为深灰色，确保在浅色背景上可见 */
+    }
+    .metric-box strong, .metric-box span {
+        color: #333; /* 确保 Strong 和 Span 元素也使用深色 */
     }
     .result-success {
         background: linear-gradient(135deg, #00d084 0%, #00d084 100%);
@@ -78,21 +83,25 @@ st.markdown("""
 @st.cache_resource
 def load_models():
     try:
+        # joblib.load() 默认第一个参数是路径，不应有 mode 或 mmap_mode 冲突
         return joblib.load(model_path)
     except Exception as e:
-        st.error(f"❌ 模型加载失败: {e}")
+        # 优化错误处理，显示加载路径，帮助调试 ModuleNotFoundError
+        st.error(f"❌ 模型加载失败。请检查 'inhibitor_model.pkl' 文件是否存在且依赖库已安装。错误详情: {e}")
         st.stop()
 
 model = load_models()
+
 # 生成分子SMILES结构图（使用在线API）
 def get_molecule_image(smiles):
     try:
-        import requests
         url = f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/{smiles}/PNG?image_size=350x350"
         response = requests.get(url, timeout=5)
         if response.status_code == 200:
             return Image.open(io.BytesIO(response.content))
-    except:
+    except Exception as e:
+        # 避免 API 错误导致整个应用崩溃
+        st.warning(f"无法加载分子结构图（API错误或超时）。{e}")
         pass
     return None
 
@@ -115,10 +124,18 @@ if predict_button and smiles_input:
         st.error("❌ 无效的SMILES，请检查输入")
     else:
         # 生成指纹和预测
-        fp = GetMorganFingerprintAsBitVect(mol, 2, nBits=1024)
-        prediction = model.predict([fp])[0]
-        probability = model.predict_proba([fp])[0]
-        
+        # 注意：这里假设 model 是一个可以直接调用 .predict() 和 .predict_proba() 的分类器
+        try:
+            fp = GetMorganFingerprintAsBitVect(mol, 2, nBits=1024)
+            prediction = model.predict([fp])[0]
+            probability = model.predict_proba([fp])[0]
+        except AttributeError as e:
+            st.error(f"❌ 模型对象错误 (AttributeError)。请检查 'inhibitor_model.pkl' 中加载的对象是否具备 .predict() 或 .predict_proba() 方法。错误详情: {e}")
+            st.stop()
+        except Exception as e:
+            st.error(f"❌ 预测过程中发生未知错误: {e}")
+            st.stop()
+            
         # 分子结构和信息
         col1, col2 = st.columns([1, 1.2], gap="large")
         
@@ -138,6 +155,7 @@ if predict_button and smiles_input:
             st.markdown('<div class="molecule-section">', unsafe_allow_html=True)
             st.subheader("📊 分子性质")
             
+            # 使用 RDKit 计算描述符
             properties = [
                 ("分子量", f"{Descriptors.MolWt(mol):.2f} g/mol"),
                 ("LogP", f"{Descriptors.MolLogP(mol):.2f}"),
@@ -149,6 +167,7 @@ if predict_button and smiles_input:
             ]
             
             for label, value in properties:
+                # 这里的 metric-box 使用了深色字体，确保可见
                 st.markdown(f"""
                     <div class="metric-box">
                         <strong>{label}</strong><br>
@@ -175,7 +194,8 @@ if predict_button and smiles_input:
             st.metric("置信度", f"{confidence:.2%}")
         
         with col_result3:
-            st.metric("预测概率", f"{probability[1]:.2%}")
+            # 假设类别 1 是“抑制剂”
+            st.metric("抑制剂概率", f"{probability[1]:.2%}")
         
         # 概率可视化
         st.markdown("---")
@@ -221,21 +241,21 @@ col_ex1, col_ex2, col_ex3 = st.columns(3, gap="large")
 with col_ex1:
     st.markdown("""
     <div style="background: rgba(102,126,234,0.1); padding: 15px; border-radius: 10px; text-align: center;">
-        <code style="background: rgba(102,126,234,0.2); padding: 8px; border-radius: 5px;">CC(C)Cc1ccc(cc1)</code>
+        <code style="background: rgba(102,126,234,0.2); padding: 8px; border-radius: 5px; color: #333;">CC(C)Cc1ccc(cc1)</code>
     </div>
     """, unsafe_allow_html=True)
 
 with col_ex2:
     st.markdown("""
     <div style="background: rgba(102,126,234,0.1); padding: 15px; border-radius: 10px; text-align: center;">
-        <code style="background: rgba(102,126,234,0.2); padding: 8px; border-radius: 5px;">c1ccccc1</code>
+        <code style="background: rgba(102,126,234,0.2); padding: 8px; border-radius: 5px; color: #333;">c1ccccc1</code>
     </div>
     """, unsafe_allow_html=True)
 
 with col_ex3:
     st.markdown("""
     <div style="background: rgba(102,126,234,0.1); padding: 15px; border-radius: 10px; text-align: center;">
-        <code style="background: rgba(102,126,234,0.2); padding: 8px; border-radius: 5px;">CCO</code>
+        <code style="background: rgba(102,126,234,0.2); padding: 8px; border-radius: 5px; color: #333;">CCO</code>
     </div>
     """, unsafe_allow_html=True)
 
@@ -244,10 +264,3 @@ st.markdown("""
         <p>Made with ❤️ using Streamlit & RDKit</p>
     </div>
 """, unsafe_allow_html=True)
-
-
-
-
-
-
-

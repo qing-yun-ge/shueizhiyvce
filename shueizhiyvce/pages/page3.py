@@ -84,7 +84,7 @@ st.markdown("""
 @st.cache_resource
 def load_model():
     return joblib.load(model_path,'./inhibitor_model.pkl')
-
+ 
 model = load_model()
 
 # 生成分子SMILES结构图（使用在线API）
@@ -251,5 +251,6 @@ st.markdown("""
         <p>Made with ❤️ using Streamlit & RDKit</p>
     </div>
 """, unsafe_allow_html=True)
+
 
 

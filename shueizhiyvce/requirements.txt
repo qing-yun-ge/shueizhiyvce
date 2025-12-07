@@ -6,3 +6,6 @@ pymcdm
 matplotlib
 plotly
 xgboost
+joblib
+rdkit
+

@@ -7,9 +7,11 @@ import plotly.graph_objects as go
 from PIL import Image
 import io
 import os
+
 # 获取当前文件所在目录
 current_dir = os.path.dirname(os.path.abspath(__file__))
 model_path = os.path.join(current_dir, 'inhibitor_model.pkl')
+
 st.set_page_config(page_title="抑制剂预测", layout="wide", initial_sidebar_state="collapsed")
 
 # 自定义CSS美化
@@ -18,14 +20,6 @@ st.markdown("""
     .main {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         padding: 20px;
-    }
-    .stTitle {
-        color: white;
-        text-align: center;
-        font-size: 3em;
-        font-weight: bold;
-        margin-bottom: 30px;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
     }
     .metric-box {
         background: rgba(255,255,255,0.1);
@@ -83,16 +77,18 @@ st.markdown("""
 # 加载模型
 @st.cache_resource
 def load_model():
-     return joblib.load( model_path,'./inhibitor_model.pkl')
- 
+    if not os.path.exists(model_path):
+        st.error(f"❌ 模型文件不存在: {model_path}")
+        st.stop()
+    return joblib.load(model_path)
+
 model = load_model()
 
 # 生成分子SMILES结构图（使用在线API）
 def get_molecule_image(smiles):
     try:
-        # 使用PubChem API获取分子结构图
-        url = f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/{smiles}/PNG?image_size=350x350"
         import requests
+        url = f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/{smiles}/PNG?image_size=350x350"
         response = requests.get(url, timeout=5)
         if response.status_code == 200:
             return Image.open(io.BytesIO(response.content))
@@ -130,7 +126,6 @@ if predict_button and smiles_input:
             st.markdown('<div class="molecule-section">', unsafe_allow_html=True)
             st.subheader("🧬 分子结构")
             
-            # 尝试获取分子图像
             mol_img = get_molecule_image(smiles_input)
             if mol_img:
                 st.image(mol_img, use_column_width=True)
@@ -143,7 +138,6 @@ if predict_button and smiles_input:
             st.markdown('<div class="molecule-section">', unsafe_allow_html=True)
             st.subheader("📊 分子性质")
             
-            # 创建信息卡片
             properties = [
                 ("分子量", f"{Descriptors.MolWt(mol):.2f} g/mol"),
                 ("LogP", f"{Descriptors.MolLogP(mol):.2f}"),
@@ -187,7 +181,6 @@ if predict_button and smiles_input:
         st.markdown("---")
         st.subheader("📈 预测概率分布")
         
-        # 使用Plotly绘制概率图
         fig = go.Figure(data=[
             go.Bar(
                 x=['非抑制剂', '是抑制剂'],
@@ -251,8 +244,3 @@ st.markdown("""
         <p>Made with ❤️ using Streamlit & RDKit</p>
     </div>
 """, unsafe_allow_html=True)
-
-
-
-
-
